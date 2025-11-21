@@ -9,7 +9,6 @@ export async function hashString(str) {
     });
 }
 
-
 export async function compareHash(hash, str) {
     return await argon2.verify(hash, str)
 }
