@@ -121,3 +121,128 @@ export const createCandidateDocumentService = async ({ candidate_id, file_url, f
 
     return newDocument;
 };
+
+export const updateCandidateAddressService = async (addressId, updateData) => {
+    if (!addressId) throw new Error("Address ID is required");
+    if (!updateData || Object.keys(updateData).length === 0) {
+        throw new Error("No data provided for update");
+    }
+
+    // ตรวจสอบว่ามี Address อยู่จริง
+    const existingAddress = await prisma.address.findUnique({
+        where: { address_id: addressId },
+    });
+
+    if (!existingAddress) throw new Error("Address not found");
+
+    const updatedAddress = await prisma.address.update({
+        where: { address_id: addressId },
+        data: {
+            address_type: updateData.address_type ?? existingAddress.address_type,
+            address_line1: updateData.address_line1 ?? existingAddress.address_line1,
+            address_line2: updateData.address_line2 ?? existingAddress.address_line2,
+            city: updateData.city ?? existingAddress.city,
+            state: updateData.state ?? existingAddress.state,
+            postal_code: updateData.postal_code ?? existingAddress.postal_code,
+            country: updateData.country ?? existingAddress.country,
+            is_current: updateData.is_current ?? existingAddress.is_current,
+        },
+    });
+
+    return updatedAddress;
+};
+
+export const deleteCandidateAddressService = async (addressId) => {
+    if (!addressId) throw new Error("Address ID is required");
+
+    // ตรวจสอบว่ามี Address อยู่จริง
+    const existingAddress = await prisma.address.findUnique({
+        where: { address_id: addressId },
+    });
+
+    if (!existingAddress) throw new Error("Address not found");
+
+    const deletedAddress = await prisma.address.delete({
+        where: { address_id: addressId },
+    });
+
+    return deletedAddress;
+};
+
+export const deleteCandidateDocumentService = async (documentId) => {
+    // ตรวจสอบว่าเอกสารมีอยู่หรือไม่
+    const existingDoc = await prisma.document.findUnique({
+        where: { document_id: documentId },
+    });
+
+    if (!existingDoc) {
+        throw new Error("Document not found");
+    }
+
+    // ลบเอกสาร
+    const deletedDoc = await prisma.document.delete({
+        where: { document_id: documentId },
+    });
+
+    return deletedDoc;
+};
+
+
+export const getCandidateDocumentsService = async (candidateId) => {
+    // ตรวจสอบว่าผู้สมัครมีอยู่หรือไม่
+    const candidate = await prisma.candidate.findUnique({
+        where: { candidate_id: candidateId },
+    });
+
+    if (!candidate) {
+        throw new Error("Candidate not found");
+    }
+
+    // ดึงเอกสารทั้งหมดของผู้สมัคร
+    const documents = await prisma.document.findMany({
+        where: { candidate_id: candidateId },
+    });
+
+    return documents;
+};
+
+export const getCandidateStatusService = async (candidateId) => {
+    // ตรวจสอบว่าผู้สมัครมีอยู่หรือไม่
+    const candidate = await prisma.candidate.findUnique({
+        where: { candidate_id: candidateId },
+    });
+
+    if (!candidate) {
+        throw new Error("Candidate not found");
+    }
+
+    // ดึงสถานะทั้งหมดของผู้สมัคร
+    const statuses = await prisma.candidateStatus.findMany({
+        where: { candidate_id: candidateId },
+        orderBy: { created_at: 'desc' }, // เรียงล่าสุดก่อน
+    });
+
+    return statuses;
+};
+
+export const updateCandidateStatusService = async (candidateId, statusData) => {
+    const { status, updatedBy } = statusData;
+
+    const candidate = await prisma.candidate.findUnique({
+        where: { candidate_id: candidateId },
+    });
+
+    if (!candidate) {
+        throw new Error("Candidate not found");
+    }
+
+    const newStatus = await prisma.candidateStatus.create({
+        data: {
+            candidate_id: candidateId,
+            status: status,
+            updated_by: updatedBy || null,
+        },
+    });
+
+    return newStatus;
+};

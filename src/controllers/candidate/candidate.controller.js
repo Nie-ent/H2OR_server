@@ -2,11 +2,17 @@ import {
     addCandidateAddressService,
     applyResumeService,
     createCandidateDocumentService,
+    deleteCandidateAddressService,
+    deleteCandidateDocumentService,
     deleteCandidateService,
     findCandidate,
     findCandidateById,
+    getCandidateDocumentsService,
     getCandidateInfoByIdService,
+    getCandidateStatusService,
+    updateCandidateAddressService,
     updateCandidateService,
+    updateCandidateStatusService,
 }
     from "../../services/candidate/candidate.service.js";
 
@@ -151,5 +157,103 @@ export const createCandidateDocument = async (req, res) => {
     } catch (error) {
         console.error("Error creating document:", error.message);
         return res.status(500).json({ message: error.message || "Internal server error" });
+    }
+};
+
+export const updateCandidateAddress = async (req, res) => {
+    try {
+        const { id } = req.params; // address_id
+        const updateData = req.body;
+
+        const updatedAddress = await updateCandidateAddressService(id, updateData);
+
+        res.status(200).json({
+            message: "Address updated successfully",
+            address: updatedAddress,
+        });
+    } catch (error) {
+        console.error("Error updating candidate address:", error.message);
+        res.status(400).json({ message: error.message });
+    }
+};
+
+export const deleteCandidateAddress = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const deletedAddress = await deleteCandidateAddressService(id);
+
+        res.status(200).json({
+            message: "Address deleted successfully",
+        });
+    } catch (error) {
+        console.error("Error deleting candidate address:", error.message);
+        res.status(400).json({ message: error.message });
+    }
+};
+
+export const deleteCandidateDocument = async (req, res) => {
+    try {
+        const { document_id } = req.params;
+
+        const deletedDoc = await deleteCandidateDocumentService(document_id);
+
+        res.status(200).json({
+            message: "Document deleted successfully",
+            document: deletedDoc,
+        });
+    } catch (error) {
+        console.error("Error deleting document:", error.message);
+        res.status(400).json({ message: error.message });
+    }
+};
+
+export const getCandidateDoc = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const documents = await getCandidateDocumentsService(id);
+
+        res.status(200).json({
+            message: "Documents retrieved successfully",
+            documents,
+        });
+    } catch (error) {
+        console.error("Error fetching candidate documents:", error.message);
+        res.status(400).json({ message: error.message });
+    }
+};
+
+
+export const getCandidateStatus = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const statuses = await getCandidateStatusService(id);
+
+        res.status(200).json({
+            message: "Candidate statuses retrieved successfully",
+            statuses,
+        });
+    } catch (error) {
+        console.error("Error fetching candidate statuses:", error.message);
+        res.status(400).json({ message: error.message });
+    }
+};
+
+export const updateCadidateStatus = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const statusData = req.body;
+
+        const updatedStatus = await updateCandidateStatusService(id, statusData);
+
+        res.status(201).json({
+            message: "Candidate status updated successfully",
+            status: updatedStatus,
+        });
+    } catch (error) {
+        console.error("Error updating candidate status:", error.message);
+        res.status(400).json({ message: error.message });
     }
 };
