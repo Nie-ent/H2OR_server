@@ -1,5 +1,4 @@
 import { deleteAdminService, findAdminService, getAdminService, registerAdminService, updateAdminService } from "../../services/admin/admin.service.js";
-import prisma from "../../config/prisma-client.config.js";
 import { hashString } from "../../libs/hash.lib.js";
 
 export const registerAdmin = async (req, res) => {
