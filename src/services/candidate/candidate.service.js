@@ -32,3 +32,22 @@ export const applyResumeService = async (firstName, lastName, email, phone, gend
         throw error;
     }
 }
+
+
+export const getCandidateInfoByIdService = async (id) => {
+    try {
+        const candidate = await prisma.candidate.findUnique({
+            where: { candidate_id: id },
+            include: {
+                addresses: true,
+                documents: true,
+                candidate_statuses: true,
+                tests: true
+            }
+        });
+        return candidate
+    } catch (error) {
+        console.error("Error creating candidate:", error);
+        throw error;
+    }
+}
