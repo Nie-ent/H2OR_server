@@ -1,5 +1,20 @@
-import { PrismaClient, Prisma } from "../../generated/prisma/index.js";
+import { PrismaMariaDb } from "@prisma/adapter-mariadb";
+import { PrismaClient } from "@prisma/client";
+import dotenv from "dotenv";
+dotenv.config();
 
-const prisma = new PrismaClient();
 
-export { prisma, Prisma };
+const adapter = new PrismaMariaDb({
+    host: process.env.DATABASE_HOST,
+    port: 3306,
+    user: process.env.DATABASE_USER,
+    password: process.env.DATABASE_PASSWORD,
+    database: process.env.DATABASE_NAME,
+    connectionLimit: 10
+});
+
+const prisma = new PrismaClient({
+    adapter
+});
+
+export default prisma;

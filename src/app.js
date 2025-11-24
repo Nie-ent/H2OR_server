@@ -1,22 +1,22 @@
 import express from 'express'
 import helmet from 'helmet'
-import cors from 'cors'
 import rateLimit from 'express-rate-limit'
 import compression from 'compression'
+import cors from 'cors'
 
 import mainRouter from './routes/main.route.js'
+
 import { notFoundMiddleware } from './middlewares/not-found.middleware.js'
 import { defaultErrorMiddleware } from './middlewares/errors/default-error.middleware.js'
 import { prismaErrorMiddleware } from './middlewares/errors/prisma-error.middleware.js'
 import { jwtErrorMiddleware } from './middlewares/errors/jwt-error.middleware.js'
 import { zodErrorMiddleware } from './middlewares/errors/zod-error.middleware.js'
 
-
 const app = express()
 
 app.use(express.json())
 
-//Third Party Middlewares
+// Third Party Middlewares
 app.use(helmet())
 app.use(compression())
 app.use(rateLimit({
@@ -25,23 +25,21 @@ app.use(rateLimit({
 }))
 app.use(cors({
     origin: '*',
-    method: ["GET", "POST", "PUT", "DELETE"],
+    method: ["GET", "POST", "PUT", "PATCH", "DELETE"],
     credentials: true
 }))
 
+app.use('/api', mainRouter)
 
-//router
-app.use(mainRouter)
-
-// Not-found error handler
+// Not found handler (404)
 app.use(notFoundMiddleware)
 
-// Middleware error handler 
-app.use(prismaErrorMiddleware)
-app.use(jwtErrorMiddleware)
+// Error middlewares
 app.use(zodErrorMiddleware)
+app.use(jwtErrorMiddleware)
+app.use(prismaErrorMiddleware)
 
-// Default error handler
+// Default error
 app.use(defaultErrorMiddleware)
 
 export default app
