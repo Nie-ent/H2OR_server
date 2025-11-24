@@ -8,5 +8,5 @@ export const zodErrorMiddleware = (err, req, res, next) => {
         return next(badRequest);
     }
 
-    next(err); // Pass to the next error handler
+    next(err);
 };
