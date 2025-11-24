@@ -1,37 +1,53 @@
 import { Router } from "express";
+
 import {
-    addCandidateAddress,
-    createCandidateDocument,
+    resumeApplication,
+    getCandidateInfoById,
+    updateCandidateInfo,
     deleteCandidate,
+
+    // Address
+    addCandidateAddress,
+    updateCandidateAddress,
     deleteCandidateAddress,
+
+    // Document
+    createCandidateDocument,
     deleteCandidateDocument,
     getCandidateDoc,
-    getCandidateInfoById,
+
+    // Status
     getCandidateStatus,
-    resumeApplication,
     updateCadidateStatus,
-    updateCandidateAddress,
-    updateCandidateInfo
+    requestUpdateCandidateStatus,
+    rejectCandidateStatus,
+    approveCandidateStatus,
 } from "../controllers/candidate/candidate.controller.js";
 
 const candidateRoutes = Router();
 
-// Candidates
+// Candidate
 candidateRoutes.post("/candidates", resumeApplication);
-candidateRoutes.get("/candidates/:id", getCandidateInfoById);
-candidateRoutes.put("/candidates/:id", updateCandidateInfo);
-candidateRoutes.delete("/candidates/:id", deleteCandidate);
+candidateRoutes.get("/candidates/:candidateId", getCandidateInfoById);
+candidateRoutes.put("/candidates/:candidateId", updateCandidateInfo);
+candidateRoutes.delete("/candidates/:candidateId", deleteCandidate);
 
-// Addresses
-candidateRoutes.post("/candidates/:id/address", addCandidateAddress);
-candidateRoutes.put("/addresses/:id", updateCandidateAddress);
-candidateRoutes.delete("/addresses/:id", deleteCandidateAddress);
+// Address
+candidateRoutes.post("/candidates/:candidateId/addresses", addCandidateAddress);
+candidateRoutes.put("/addresses/:addressId", updateCandidateAddress);
+candidateRoutes.delete("/addresses/:addressId", deleteCandidateAddress);
 
-// Documents
-candidateRoutes.post("/candidates/:id/documents", createCandidateDocument);
-candidateRoutes.delete("/documents/:document_id", deleteCandidateDocument);
-candidateRoutes.get("/candidates/:id/documents", getCandidateDoc);
-candidateRoutes.get("/candidates/:id/status", getCandidateStatus);
-candidateRoutes.post("/candidates/:id/status", updateCadidateStatus);
+// Document
+candidateRoutes.post("/candidates/:candidateId/documents", createCandidateDocument);
+candidateRoutes.get("/candidates/:candidateId/documents", getCandidateDoc);
+candidateRoutes.delete("/documents/:documentId", deleteCandidateDocument);
+
+// Status
+candidateRoutes.get("/candidates/:candidateId/status", getCandidateStatus);
+candidateRoutes.post("/candidates/:candidateId/status", updateCadidateStatus);
+candidateRoutes.post('/status-update-request', requestUpdateCandidateStatus)
+candidateRoutes.patch('/status-update-request/:id/approve', approveCandidateStatus)
+candidateRoutes.patch('/status-update-request/:id/reject', rejectCandidateStatus)
+
 
 export default candidateRoutes;

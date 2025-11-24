@@ -1,6 +1,7 @@
 import {
     addCandidateAddressService,
     applyResumeService,
+    approveCandidateStatusService,
     createCandidateDocumentService,
     deleteCandidateAddressService,
     deleteCandidateDocumentService,
@@ -10,6 +11,8 @@ import {
     getCandidateDocumentsService,
     getCandidateInfoByIdService,
     getCandidateStatusService,
+    rejectCandidateStatusService,
+    requestUpdateCandidateStatusService,
     updateCandidateAddressService,
     updateCandidateService,
     updateCandidateStatusService,
@@ -254,6 +257,61 @@ export const updateCadidateStatus = async (req, res) => {
         });
     } catch (error) {
         console.error("Error updating candidate status:", error.message);
+        res.status(400).json({ message: error.message });
+    }
+};
+
+export const requestUpdateCandidateStatus = async (req, res) => {
+    try {
+        const newRequest = await requestUpdateCandidateStatusService(req.body);
+
+        return res.status(201).json({
+            message: "Status update request created successfully",
+            data: newRequest
+        });
+
+    } catch (error) {
+        console.error("Error creating status update request:", error);
+        return res.status(500).json({
+            message: error.message || "Internal server error"
+        });
+    }
+};
+
+export const approveCandidateStatus = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const adminId = req.body.adminId;
+
+        if (!adminId) return res.status(400).json({ message: "Admin ID is required" });
+
+        const updatedRequest = await approveCandidateStatusService(id, adminId);
+
+        res.status(200).json({
+            message: "Status update request approved successfully",
+            data: updatedRequest,
+        });
+    } catch (error) {
+        console.error("Error approving status request:", error.message);
+        res.status(400).json({ message: error.message });
+    }
+};
+
+export const rejectCandidateStatus = async (req, res) => {
+    try {
+        const { id } = req.params; // status_update_request_id
+        const adminId = req.body.adminId; // ผู้อนุมัติ
+
+        if (!adminId) return res.status(400).json({ message: "Admin ID is required" });
+
+        const updatedRequest = await rejectCandidateStatusService(id, adminId);
+
+        res.status(200).json({
+            message: "Status update request rejected successfully",
+            data: updatedRequest,
+        });
+    } catch (error) {
+        console.error("Error rejecting status request:", error.message);
         res.status(400).json({ message: error.message });
     }
 };

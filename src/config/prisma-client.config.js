@@ -1,9 +1,8 @@
 import { PrismaMariaDb } from "@prisma/adapter-mariadb";
-import pkg from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 import dotenv from "dotenv";
 dotenv.config();
 
-const { PrismaClient } = pkg;
 
 const adapter = new PrismaMariaDb({
     host: process.env.DATABASE_HOST,

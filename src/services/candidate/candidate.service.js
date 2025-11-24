@@ -246,3 +246,71 @@ export const updateCandidateStatusService = async (candidateId, statusData) => {
 
     return newStatus;
 };
+
+export const requestUpdateCandidateStatusService = async (data) => {
+    const { candidate_status_id, requested_status, request_by } = data;
+
+    const existingStatus = await prisma.candidateStatus.findUnique({
+        where: { candidate_status_id },
+    });
+
+    if (!existingStatus) {
+        throw new Error("Candidate status not found");
+    }
+
+    const newRequest = await prisma.statusUpdateRequests.create({
+        data: {
+            candidate_status_id,
+            requested_status,
+            request_by: request_by || null,
+        },
+    });
+
+    return newRequest;
+};
+
+export const approveCandidateStatusService = async (requestId, adminId) => {
+    const request = await prisma.statusUpdateRequests.findUnique({
+        where: { status_update_request_id: requestId },
+    });
+
+    if (!request) throw new Error("Status update request not found");
+    if (request.status !== "pending") throw new Error("Request has already been processed");
+
+    const updatedRequest = await prisma.statusUpdateRequests.update({
+        where: { status_update_request_id: requestId },
+        data: {
+            status: "accepted",
+            approve_by: adminId,
+            approved_at: new Date(),
+        },
+    });
+
+    // Update the candidate_status as well
+    await prisma.candidateStatus.update({
+        where: { candidate_status_id: request.candidate_status_id },
+        data: { status: request.requested_status },
+    });
+
+    return updatedRequest;
+};
+
+export const rejectCandidateStatusService = async (requestId, adminId) => {
+    const request = await prisma.statusUpdateRequests.findUnique({
+        where: { status_update_request_id: requestId },
+    });
+
+    if (!request) throw new Error("Status update request not found");
+    if (request.status !== "pending") throw new Error("Request has already been processed");
+
+    const updatedRequest = await prisma.statusUpdateRequests.update({
+        where: { status_update_request_id: requestId },
+        data: {
+            status: "rejected",
+            approve_by: adminId,
+            approved_at: new Date(),
+        },
+    });
+
+    return updatedRequest;
+};

@@ -18,3 +18,7 @@ export const loginAdminDto = z.object({
     email: z.string().email(),
     password: z.string(),
 });
+
+export const adminIdParamsDto = z.object({
+    id: z.string().uuid("Invalid admin_user_id"),
+});
