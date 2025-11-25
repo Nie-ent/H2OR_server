@@ -1,3 +1,6 @@
+import path from "path";
+import cloudinary from "../../config/cloudinary.config.js";
+import fs from 'fs/promises'
 import {
     addCandidateAddressService,
     applyResumeService,
@@ -148,12 +151,27 @@ export const addCandidateAddress = async (req, res) => {
 };
 
 export const createCandidateDocument = async (req, res) => {
+    let uploadResult
+
     try {
-        const documentData = req.body;
+        const haveFile = req.file
+        console.log('haveFile', haveFile)
+        if (haveFile) {
+            uploadResult = await cloudinary.uploader.upload(haveFile.path, {
+                folder: "documents",
+            });
+        }
 
+        const file_url = uploadResult.secure_url
+        const file_type = uploadResult.type
+        const doc_type = haveFile.fieldname
 
+        console.log('doc_type', doc_type)
 
-        const newDocument = await createCandidateDocumentService(documentData);
+        console.log('uploadResult', uploadResult)
+
+        const documentData = { candidate_id, file_url, file_type, doc_type }
+        // const newDocument = await createCandidateDocumentService(documentData);
 
         return res.status(201).json({
             message: "Document created successfully",
@@ -162,6 +180,8 @@ export const createCandidateDocument = async (req, res) => {
     } catch (error) {
         console.error("Error creating document:", error.message);
         return res.status(500).json({ message: error.message || "Internal server error" });
+    } finally {
+        fs.unlink(req.file.path)
     }
 };
 

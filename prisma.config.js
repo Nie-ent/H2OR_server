@@ -10,7 +10,6 @@ export default defineConfig({
     url: env('DATABASE_URL'),
   },
 
-  // 👇 เพิ่มส่วนนี้เข้าไป
   seed: {
     run: './prisma/seed.js',
   },
