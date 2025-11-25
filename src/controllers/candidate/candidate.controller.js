@@ -151,6 +151,8 @@ export const createCandidateDocument = async (req, res) => {
     try {
         const documentData = req.body;
 
+
+
         const newDocument = await createCandidateDocumentService(documentData);
 
         return res.status(201).json({
