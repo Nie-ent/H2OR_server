@@ -24,6 +24,8 @@ import {
     approveCandidateStatus,
 } from "../controllers/candidate/candidate.controller.js";
 
+import upload from "../middlewares/upload.middleware.js";
+
 const candidateRoutes = Router();
 
 // Candidate
@@ -38,7 +40,7 @@ candidateRoutes.put("/addresses/:addressId", updateCandidateAddress);
 candidateRoutes.delete("/addresses/:addressId", deleteCandidateAddress);
 
 // Document
-candidateRoutes.post("/candidates/:candidateId/documents", createCandidateDocument);
+candidateRoutes.post("/candidates/:candidateId/documents", upload.single('pdf'), createCandidateDocument);
 candidateRoutes.get("/candidates/:candidateId/documents", getCandidateDoc);
 candidateRoutes.delete("/documents/:documentId", deleteCandidateDocument);
 
