@@ -1,0 +1,208 @@
+datasource db {
+  provider = "mysql"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// ----------------------------------------------------
+// ENUMS
+// ----------------------------------------------------
+enum Role {
+  admin
+  super_admin
+}
+
+enum Difficulty {
+  easy
+  medium
+  hard
+}
+
+enum StatusEnum {
+  pending
+  accepted
+  rejected
+}
+
+enum CandidateStatusEnum {
+  pending
+  pass
+  fail
+}
+
+enum DocTypeEnum {
+  pdf
+  png
+  jpg
+}
+
+enum AddressType {
+  primary
+  mailing
+  permanent
+}
+
+// ----------------------------------------------------
+// ADMIN MODEL
+// ----------------------------------------------------
+model AdminUser {
+  admin_user_id String   @id @default(uuid())
+  first_name    String
+  last_name     String
+  email         String   @unique
+  role          Role
+  password_hash String
+  created_at    DateTime @default(now())
+
+  approved_status_updates StatusUpdateRequests[] @relation("ApprovedByAdmin")
+}
+
+// ----------------------------------------------------
+// CANDIDATE MODEL
+// ----------------------------------------------------
+model Candidate {
+  candidate_id      String  @id @default(uuid())
+  first_name        String
+  last_name         String
+  email             String  @unique
+  phone             String?
+  gender            String?
+  age               Int?
+  experience_salary Int?
+  expected_salary   Int?
+  stack             String?
+  id_card           String?
+
+  tests              Test[]
+  candidate_statuses CandidateStatus[]
+  documents          Document[]
+  addresses          Address[]
+}
+
+// ----------------------------------------------------
+// ADDRESS MODEL
+// ----------------------------------------------------
+model Address {
+  address_id    String      @id @default(uuid())
+  candidate_id  String
+  address_line1 String
+  address_line2 String?
+  city          String
+  state         String?
+  postal_code   String
+  country       String
+  address_type  AddressType
+  is_current    Boolean     @default(true)
+
+  candidate Candidate @relation(fields: [candidate_id], references: [candidate_id])
+
+  @@unique([candidate_id, address_type])
+}
+
+// ----------------------------------------------------
+// CANDIDATE STATUS & DOCUMENTS
+// ----------------------------------------------------
+model CandidateStatus {
+  candidate_status_id String              @id @default(uuid())
+  candidate_id        String
+  status              CandidateStatusEnum
+  updated_by          String?
+  created_at          DateTime            @default(now())
+  updated_at          DateTime            @updatedAt
+
+  candidate              Candidate              @relation(fields: [candidate_id], references: [candidate_id])
+  status_update_requests StatusUpdateRequests[]
+}
+
+model StatusUpdateRequests {
+  status_update_request_id String     @id @default(uuid())
+  candidate_status_id      String
+  requested_status         StatusEnum
+  request_by               String?
+  approve_by               String?
+  status                   StatusEnum @default(pending)
+  created_at               DateTime   @default(now())
+  approved_at              DateTime?
+
+  candidate_status CandidateStatus @relation(fields: [candidate_status_id], references: [candidate_status_id])
+  approver         AdminUser?      @relation("ApprovedByAdmin", fields: [approve_by], references: [admin_user_id])
+}
+
+model Document {
+  document_id  String      @id @default(uuid())
+  candidate_id String
+  file_url     String
+  file_type    String
+  doc_type     DocTypeEnum
+  uploaded_at  DateTime    @default(now())
+
+  candidate Candidate @relation(fields: [candidate_id], references: [candidate_id])
+
+  @@unique([candidate_id, doc_type])
+}
+
+// ----------------------------------------------------
+// TESTING MODELS
+// ----------------------------------------------------
+model Question {
+  question_id   String     @id @default(uuid())
+  question_text String
+  mcq           Boolean    @default(true)
+  difficulty    Difficulty
+  created_at    DateTime   @default(now())
+
+  choices        Choice[]
+  test_questions TestQuestion[]
+  testAnswers    TestAnswer[]
+}
+
+model Choice {
+  choice_id   String  @id @default(uuid())
+  question_id String
+  choice_text String
+  is_correct  Boolean @default(false)
+
+  question         Question     @relation(fields: [question_id], references: [question_id])
+  selected_answers TestAnswer[] @relation("SelectedChoice")
+
+  @@unique([question_id, choice_text])
+}
+
+model Test {
+  test_id      String    @id @default(uuid())
+  candidate_id String
+  total_score  Int?
+  created_at   DateTime  @default(now())
+  completed_at DateTime?
+
+  candidate      Candidate      @relation(fields: [candidate_id], references: [candidate_id])
+  test_questions TestQuestion[]
+  test_answers   TestAnswer[]
+}
+
+model TestQuestion {
+  test_question_id String @id @default(uuid())
+  test_id          String
+  question_id      String
+
+  test     Test     @relation(fields: [test_id], references: [test_id])
+  question Question @relation(fields: [question_id], references: [question_id])
+
+  @@unique([test_id, question_id])
+}
+
+model TestAnswer {
+  test_answer_id     String   @id @default(uuid())
+  test_id            String
+  question_id        String
+  selected_choice_id String?
+  is_correct         Boolean?
+
+  test            Test     @relation(fields: [test_id], references: [test_id])
+  question        Question @relation(fields: [question_id], references: [question_id])
+  selected_choice Choice?  @relation("SelectedChoice", fields: [selected_choice_id], references: [choice_id])
+
+  @@unique([test_id, question_id])
+}
