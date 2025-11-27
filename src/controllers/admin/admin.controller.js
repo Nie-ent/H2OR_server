@@ -1,17 +1,21 @@
 import { deleteAdminService, findAdminService, getAdminService, registerAdminService, updateAdminService } from "../../services/admin/admin.service.js";
 import { hashString } from "../../libs/hash.lib.js";
+import { verifyEmail } from "../../config/nodemailer.config.js";
+import createHttpError from "http-errors";
 
 export const registerAdmin = async (req, res) => {
-    const { firstName, lastName, email, password, role } = req.body;
+    const { firstName, lastName, email, password } = req.body;
 
     try {
         const existingUser = await findAdminService(email)
         if (existingUser) return res.status(400).json({ message: "Email already exists" });
 
         const passwordHash = await hashString(password);
+        const role = "super_admin"
 
         const newAdmin = await registerAdminService(firstName, lastName, email, role, passwordHash)
 
+        const isEmailVerify = await verifyEmail("sarunya46mk@gmail.com")
         res.status(201).json({ success: true, admin: newAdmin });
     } catch (err) {
         console.error(err);

@@ -48,13 +48,14 @@ enum AddressType {
 // ADMIN MODEL
 // ----------------------------------------------------
 model AdminUser {
-  admin_user_id String   @id @default(uuid())
-  first_name    String
-  last_name     String
-  email         String   @unique
-  role          Role
-  password_hash String
-  created_at    DateTime @default(now())
+  admin_user_id   String   @id @default(uuid())
+  first_name      String
+  last_name       String
+  email           String   @unique
+  role            Role     @default(admin)
+  password_hash   String
+  is_email_verify Boolean  @default(false)
+  created_at      DateTime @default(now())
 
   approved_status_updates StatusUpdateRequests[] @relation("ApprovedByAdmin")
 }
