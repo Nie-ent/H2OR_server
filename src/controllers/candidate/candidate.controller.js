@@ -166,12 +166,10 @@ export const createCandidateDocument = async (req, res) => {
         const file_type = uploadResult.type
         const doc_type = haveFile.fieldname
 
-        console.log('doc_type', doc_type)
-
         console.log('uploadResult', uploadResult)
 
         const documentData = { candidate_id, file_url, file_type, doc_type }
-        // const newDocument = await createCandidateDocumentService(documentData);
+        const newDocument = await createCandidateDocumentService(documentData);
 
         return res.status(201).json({
             message: "Document created successfully",
