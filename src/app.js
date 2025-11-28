@@ -5,12 +5,13 @@ import compression from 'compression'
 import cors from 'cors'
 
 import mainRouter from './routes/main.route.js'
+import authRoute from './routes/auth.route.js'
 
-import { notFoundMiddleware } from './middlewares/not-found.middleware.js'
 import { defaultErrorMiddleware } from './middlewares/errors/default-error.middleware.js'
 import { prismaErrorMiddleware } from './middlewares/errors/prisma-error.middleware.js'
 import { jwtErrorMiddleware } from './middlewares/errors/jwt-error.middleware.js'
 import { zodErrorMiddleware } from './middlewares/errors/zod-error.middleware.js'
+import { notFoundMiddleware } from './middlewares/not-found.middleware.js'
 
 const app = express()
 
@@ -29,7 +30,10 @@ app.use(cors({
     credentials: true
 }))
 
+// --- Routes ---
 app.use('/api', mainRouter)
+// เชื่อม path /api/auth เข้ากับ authRoute
+app.use("/api/auth", authRoute);
 
 // Not found handler (404)
 app.use(notFoundMiddleware)
@@ -38,6 +42,7 @@ app.use(notFoundMiddleware)
 app.use(zodErrorMiddleware)
 app.use(jwtErrorMiddleware)
 app.use(prismaErrorMiddleware)
+
 
 // Default error
 app.use(defaultErrorMiddleware)

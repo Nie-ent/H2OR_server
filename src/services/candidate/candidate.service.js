@@ -1,4 +1,5 @@
 import prisma from "../../config/prisma-client.config.js"
+import createHttpError from "http-errors"
 
 export const findCandidate = async (email) => {
     try {

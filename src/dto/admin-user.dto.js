@@ -5,13 +5,13 @@ export const registerAdminDto = z.object({
     firstName: z.string(),
     lastName: z.string(),
     email: z.string().email(),
-    role: z.enum(['admin', 'super_admin']),
+    // role: z.enum(['admin', 'super_admin']),
     password: z.string(),
 }).transform((data) => ({
     first_name: data.firstName,
     last_name: data.lastName,
     email: data.email,
-    role: data.role,
+    // role: data.role,
 }));
 
 export const loginAdminDto = z.object({

@@ -1,6 +1,5 @@
 import pkg from "@prisma/client";
 const { Prisma } = pkg;
-
 import createHttpError from "http-errors";
 
 export const prismaErrorMiddleware = (err, req, res, next) => {
