@@ -1,7 +1,8 @@
 // src/services/auth/auth.service.js
 
-import argon2 from "argon2";
+import { hashString } from "../../libs/hash.lib.js";
 import prisma from "../../config/prisma-client.config.js";
+import createHttpError from "http-errors";
 
 export const registerService = async (data) => {
   // 1. เช็คว่ามีอีเมลนี้ในระบบหรือยัง
@@ -10,11 +11,11 @@ export const registerService = async (data) => {
   });
 
   if (existingUser) {
-    throw new Error("Email already exists"); // ส่ง Error ไปให้ Controller
+    throw new createHttpError("Email already exists"); 
   }
 
   // 2. เข้ารหัสรหัสผ่าน (Hashing)
-  const hashedPassword = await argon2.hash(data.password);
+  const hashedPassword = await hashString(data.password);
 
   // 3. สร้าง User ใหม่ใน DB
   const newUser = await prisma.adminUser.create({
@@ -32,7 +33,6 @@ export const registerService = async (data) => {
       last_name: true,
       email: true,
       role: true,
-      created_at: true
     }
   });
 

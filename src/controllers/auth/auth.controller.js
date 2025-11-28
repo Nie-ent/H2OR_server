@@ -22,6 +22,6 @@ export const register = async (req, res, next) => {
     if (error.message === "Email already exists") {
       return res.status(409).json({ message: "อีเมลนี้ถูกใช้งานแล้ว" });
     }
-    next(error); // ส่งต่อให้ Global Error Handler (Zod error etc.)
+    next(error); 
   }
 };

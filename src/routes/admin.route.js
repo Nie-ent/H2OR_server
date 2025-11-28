@@ -23,12 +23,12 @@ const adminRoutes = Router();
 adminRoutes.get("/admin/users", getAdmin);
 
 // // POST: Create admin
-// adminRoutes.post("/admin/users", validateBody(registerAdminDto), registerAdmin);
+adminRoutes.post("/admin/users", validateBody(registerAdminDto), registerAdmin);
 
 // // PUT: Update admin
-// adminRoutes.put("/admin/users/:id", validateBody(registerAdminDto), updateAdmin);
+adminRoutes.put("/admin/users/:id", validateBody(registerAdminDto), updateAdmin);
 
 // // DELETE: Remove admin
-// adminRoutes.delete("/admin/users/:id", deleteAdmin);
+adminRoutes.delete("/admin/users/:id", deleteAdmin);
 
 export default adminRoutes;
