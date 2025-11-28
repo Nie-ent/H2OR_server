@@ -5,7 +5,7 @@ const testRoutes = Router()
 
 testRoutes.post('/tests/start/:candidate_id', startTest)
 testRoutes.get('/tests/:test_id/questions', getTestQuestion)
-testRoutes.post('/test/:test_id/anwsers', submitAnswer)
+testRoutes.post('/tests/:test_id/answers', submitAnswer)
 testRoutes.get('/tests/:test_id/result', getTestResult)
 
 export default testRoutes

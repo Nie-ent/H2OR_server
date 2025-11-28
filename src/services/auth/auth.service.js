@@ -26,12 +26,12 @@ export const registerService = async (data) => {
       role: "admin", // default role
     },
     // เลือก return เฉพาะฟิลด์ที่ปลอดภัย (ไม่ส่ง password กลับ)
-    select: {
+    select: { 
       admin_user_id: true,
       first_name: true,
       last_name: true,
       email: true,
-      role: admin,
+      role: true,
       created_at: true
     }
   });

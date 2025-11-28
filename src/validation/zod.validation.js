@@ -129,3 +129,15 @@ export const testAnswerSchema = z.object({
     selected_choice_id: z.string().uuid().optional(),
     is_correct: z.boolean().optional(),
 });
+
+// ------------------------------
+// AUTH VALIDATION for REGISTER & LOGIN
+// ------------------------------
+
+// ✅ ต้องใช้ตัวนี้สำหรับรับค่าจาก Postman
+export const registerSchema = z.object({
+  first_name: z.string().min(4, "กรุณาระบุชื่อจริง"),
+  last_name: z.string().min(4, "กรุณาระบุนามสกุล"),
+  email: z.string().email("รูปแบบอีเมลไม่ถูกต้อง"),
+  password: z.string().min(6, "รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร"), // รับ password
+});

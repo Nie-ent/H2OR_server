@@ -1,7 +1,7 @@
 // src/controllers/auth/auth.controller.js
 
-import * as authService from "../services/auth.service.js";
-import { registerSchema } from "../validation/auth.validation.js";
+import * as authService from "../../services/auth/auth.service.js";
+import {registerSchema}  from "../../validation/zod.validation.js";
 
 export const register = async (req, res, next) => {
   try {
