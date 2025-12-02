@@ -3,7 +3,6 @@
 import { hashString } from "../../libs/hash.lib.js";
 import prisma from "../../config/prisma-client.config.js";
 import createHttpError from "http-errors";
-import jwt from "jsonwebtoken";
 import { signToken } from "../../libs/jwt.lib.js";
 
 export const registerService = async (data) => {
@@ -73,11 +72,28 @@ export const loginService = async (data) => {
   return {
     token,
     user: {
-      id: user.admin_user_id,
       first_name: user.first_name,
       last_name: user.last_name,
       email: user.email,
-      role: user.role
     }
   };
+};
+
+export const getMeService = async (userId) => {
+  const user = await prisma.adminUser.findUnique({
+    where: { admin_user_id: userId },
+    select: {
+      admin_user_id: true,
+      first_name: true,
+      last_name: true,
+      email: true,
+      role: true,
+      created_at: true,
+    },
+  });
+  
+  if (!user) throw new createHttpError("User not found");
+  
+  return user;
+  
 };
