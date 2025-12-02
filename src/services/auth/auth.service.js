@@ -21,8 +21,8 @@ export const registerService = async (data) => {
   // 3. สร้าง User ใหม่ใน DB
   const newUser = await prisma.adminUser.create({
     data: {
-      first_name: data.first_name,
-      last_name: data.last_name,
+      firstName: data.firsrtName,
+      lastName: data.lastName,
       email: data.email,
       password_hash: hashedPassword, // เก็บตัวที่ hash แล้ว
       role: "admin", // default role
@@ -30,8 +30,8 @@ export const registerService = async (data) => {
     // เลือก return เฉพาะฟิลด์ที่ปลอดภัย (ไม่ส่ง password กลับ)
     select: { 
       admin_user_id: true,
-      first_name: true,
-      last_name: true,
+      firstName: true,
+      lastName: true,
       email: true,
       role: true,
     }
@@ -84,15 +84,15 @@ export const getMeService = async (userId) => {
     where: { admin_user_id: userId },
     select: {
       admin_user_id: true,
-      first_name: true,
-      last_name: true,
+      firstName: true,
+      lastName: true,
       email: true,
       role: true,
       created_at: true,
     },
   });
   
-  if (!user) throw new createHttpError("User not found");
+  if (!user) throw createHttpError("User not found");
   
   return user;
   

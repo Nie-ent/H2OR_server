@@ -41,6 +41,7 @@ export const resumeApplication = async (req, res) => {
             stack,
             expected_salary
         );
+        console.log("newCandidate",newCandidate)
 
         return res.status(201).json({
             message: "Candidate created successfully",
