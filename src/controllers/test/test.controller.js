@@ -5,21 +5,25 @@ import {
     submitTestAnswersService
 } from "../../services/test/test.service.js";
 
+// POST /tests/start/:candidate_id
 export const startTest = async (req, res) => {
     console.log(req.params)
     try {
         const { candidate_id } = req.params;
-        const { numberOfQuestions } = req.body;
 
-        const test = await startTestService(candidate_id, numberOfQuestions || 10);
+        if (!candidate_id) {
+            return res.status(400).json({ message: "Candidate ID is required" });
+        }
+
+        const test = await startTestService(candidate_id, 20);
 
         res.status(201).json({
             message: "Test started successfully",
-            test,
+            data: test,
         });
     } catch (error) {
         console.error("Error starting test:", error.message);
-        res.status(400).json({ message: error.message });
+        res.status(404).json({ message: error.message });
     }
 };
 
