@@ -6,6 +6,7 @@ import {
 } from "../../services/test/test.service.js";
 
 export const startTest = async (req, res) => {
+    console.log(req.params)
     try {
         const { candidate_id } = req.params;
         const { numberOfQuestions } = req.body;

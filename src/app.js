@@ -6,6 +6,7 @@ import cors from 'cors'
 
 import mainRouter from './routes/main.route.js'
 import authRoute from './routes/auth.route.js'
+import testRoutes from './routes/test.route.js'
 
 import { defaultErrorMiddleware } from './middlewares/errors/default-error.middleware.js'
 import { prismaErrorMiddleware } from './middlewares/errors/prisma-error.middleware.js'
@@ -34,6 +35,7 @@ app.use(cors({
 app.use('/api', mainRouter)
 // เชื่อม path /api/auth เข้ากับ authRoute
 app.use("/api/auth", authRoute);
+app.use("/api", testRoutes)
 
 // Not found handler (404)
 app.use(notFoundMiddleware)

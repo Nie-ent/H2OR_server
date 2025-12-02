@@ -1,5 +1,15 @@
 import prisma from "../../config/prisma-client.config.js";
 
+
+// Helper Function: สำหรับสลับตำแหน่ง Array (Fisher-Yates Shuffle)
+const shuffleArray = (array) => {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+};
+
 export const startTestService = async (candidateId, numberOfQuestions = 10) => {
     const candidate = await prisma.candidate.findUnique({
         where: { candidate_id: candidateId },
@@ -13,12 +23,25 @@ export const startTestService = async (candidateId, numberOfQuestions = 10) => {
         },
     });
 
-    const questions = await prisma.question.findMany({
-        take: numberOfQuestions,
-        orderBy: { created_at: 'desc' },
-    });
+      // 3. สุ่มโจทย์ (ใช้ Raw Query เพื่อความเร็วและสุ่มจริง)
+    // หมายเหตุ: ชื่อ field ที่ return จาก raw query อาจขึ้นอยู่กับ DB (มักจะเป็น snake_case)
+    const randomQuestions = await prisma.$queryRaw`
+        SELECT question_id, question_text, mcq, difficulty 
+        FROM Question 
+        ORDER BY RAND() 
+        LIMIT ${numberOfQuestions};
+    `;
 
-    const testQuestionPromises = questions.map(q =>
+    if (randomQuestions.length <= 0) {
+        throw new Error("No questions available");
+    }
+
+    // const questions = await prisma.question.findMany({
+    //     take: numberOfQuestions,
+    //     orderBy: { created_at: 'desc' },
+    // });
+
+    const testQuestionPromises = randomQuestions.map(q =>
         prisma.testQuestion.create({
             data: {
                 test_id: newTest.test_id,
@@ -28,13 +51,14 @@ export const startTestService = async (candidateId, numberOfQuestions = 10) => {
     );
     await Promise.all(testQuestionPromises);
 
+    // 5. ส่งกลับข้อมูล test พร้อมคำถาม (ไม่รวม choices)
     return {
         test_id: newTest.test_id,
         candidate_id: candidateId,
-        questions: questions.map(q => ({
+        questions: randomQuestions.map(q => ({
             question_id: q.question_id,
             question_text: q.question_text,
-            mcq: q.mcq,
+            mcq: q.mcq ? true : false,  // แปลง 1/0 เป็น boolean ถ้าจำเป็น
             difficulty: q.difficulty,
         })),
     };
@@ -58,7 +82,11 @@ export const getTestQuestionsService = async (testId) => {
         },
     });
 
-    return testQuestions.map(tq => ({
+    return testQuestions.map(tq => {
+        // ดึง choices ออกมาและสุ่มลำดับ
+        const shuffledChoices = shuffleArray([...tq.question.choices]); // ใช้ spread [...] เพื่อ copy array ก่อน shuffle
+        
+        return {
         test_question_id: tq.test_question_id,
         question_id: tq.question.question_id,
         question_text: tq.question.question_text,
@@ -67,9 +95,9 @@ export const getTestQuestionsService = async (testId) => {
         choices: tq.question.choices.map(c => ({
             choice_id: c.choice_id,
             choice_text: c.choice_text,
-            is_correct: c.is_correct,
+            // is_correct: c.is_correct,  // ⚠️ ควรปิดไว้ ไม่ส่งเฉลยไปให้ Frontend เห็น (ป้องกันการโกง)
         })),
-    }));
+    }});
 };
 
 export const submitTestAnswersService = async (testId, answers) => {
