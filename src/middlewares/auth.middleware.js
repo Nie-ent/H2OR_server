@@ -2,7 +2,7 @@ import createHttpError from "http-errors";
 import { verifyToken } from "../libs/jwt.lib.js";
 
 export const authMiddleware = (req, res, next) => {
-  console.log("Middleware is working ....")
+  // console.log("Middleware is working ....")   เอาไว้ทดสอบ ว่า Middleware ถูกเรียกใช้
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
