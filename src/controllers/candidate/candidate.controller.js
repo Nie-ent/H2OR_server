@@ -23,6 +23,7 @@ import {
     from "../../services/candidate/candidate.service.js";
 
 export const resumeApplication = async (req, res) => {
+    console.log(req.body)
     try {
         const { firstName, lastName, email, phone, gender, age, stack, expected_salary } = req.body;
 

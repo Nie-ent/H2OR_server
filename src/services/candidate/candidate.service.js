@@ -16,17 +16,17 @@ export const applyResumeService = async (firstName, lastName, email, phone, gend
     try {
         const newCandidate = await prisma.candidate.create({
             data: {
-                first_name: firstName,
-                last_name: lastName,
+                firstName: firstName,
+                lastName: lastName,
                 email,
                 phone,
                 gender,
                 age,
                 stack,
-                expected_salary: expectedSalary,
+                expectedSalary: expectedSalary,
             },
         });
-
+        console.log(newCandidate)
         return newCandidate;
     } catch (error) {
         console.error("Error creating candidate:", error);
@@ -63,14 +63,14 @@ export const updateCandidateService = async (id, data) => {
     return await prisma.candidate.update({
         where: { candidate_id: id },
         data: {
-            first_name: data.first_name,
-            last_name: data.last_name,
+            firstName: data.firstName,
+            lastName: data.lastName,
             email: data.email,
             phone: data.phone,
             gender: data.gender,
             age: data.age,
             stack: data.stack,
-            expected_salary: data.expected_salary,
+            expectedSalary: data.expectedSalary,
         }
     });
 };

@@ -35,7 +35,7 @@ app.use(cors({
 app.use('/api', mainRouter)
 // เชื่อม path /api/auth เข้ากับ authRoute
 app.use("/api/auth", authRoute);
-app.use("/api", testRoutes)
+app.use("/api/tests", testRoutes)
 
 // Not found handler (404)
 app.use(notFoundMiddleware)
