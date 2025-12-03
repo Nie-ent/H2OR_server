@@ -1,18 +1,18 @@
 // src/services/auth/auth.service.js
 
-import { hashString } from "../../libs/hash.lib.js";
+import { compareHash, hashString } from "../../libs/hash.lib.js";
 import prisma from "../../config/prisma-client.config.js";
 import createHttpError from "http-errors";
-import { signToken } from "../../libs/jwt.lib.js";
+import { signToken, verifyToken } from "../../libs/jwt.lib.js";
 
 export const registerService = async (data) => {
   // 1. เช็คว่ามีอีเมลนี้ในระบบหรือยัง
   const existingUser = await prisma.adminUser.findUnique({
-    where: { email: data.email },
+    where: { username: data.username },
   });
 
   if (existingUser) {
-    throw new createHttpError("Email already exists"); 
+    throw new createHttpError("username already exists"); 
   }
 
   // 2. เข้ารหัสรหัสผ่าน (Hashing)
@@ -21,17 +21,19 @@ export const registerService = async (data) => {
   // 3. สร้าง User ใหม่ใน DB
   const newUser = await prisma.adminUser.create({
     data: {
-      firstName: data.firsrtName,
+      firstName: data.firstName,
       lastName: data.lastName,
+      username: data.username,
       email: data.email,
       password_hash: hashedPassword, // เก็บตัวที่ hash แล้ว
-      role: "admin", // default role
+      role: data.role, // default role
     },
     // เลือก return เฉพาะฟิลด์ที่ปลอดภัย (ไม่ส่ง password กลับ)
     select: { 
       admin_user_id: true,
       firstName: true,
       lastName: true,
+      username: true,
       email: true,
       role: true,
     }
@@ -44,16 +46,15 @@ export const registerService = async (data) => {
 export const loginService = async (data) => {
   // 1. ค้นหา User
   const user = await prisma.adminUser.findUnique({
-    where: { email: data.email },
+    where: { username: data.username },
   });
-
   // ถ้าไม่เจอ User ให้โยน Error (ใช้ข้อความกลางๆ เพื่อความปลอดภัย)
   if (!user) {
     throw new createHttpError("Invalid credentials");
   }
 
 // 2. ตรวจสอบรหัสผ่าน
-  const isPasswordValid = await hashString(user.password_hash, data.password);
+  const isPasswordValid = await compareHash(user.password_hash, data.password);
 
   if (!isPasswordValid) {
     throw new createHttpError("Invalid credentials");
@@ -64,16 +65,16 @@ export const loginService = async (data) => {
     { 
       id: user.admin_user_id, 
       role: user.role,
-      email: user.email 
+      username: user.username 
     },
   );
-
   // ส่งกลับทั้ง Token และข้อมูล User (ไม่รวม password)
   return {
     token,
     user: {
-      first_name: user.first_name,
-      last_name: user.last_name,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      role: user.role,
       email: user.email,
     }
   };
