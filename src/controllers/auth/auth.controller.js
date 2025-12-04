@@ -1,7 +1,7 @@
 // src/controllers/auth/auth.controller.js
 
 import * as authService from "../../services/auth/auth.service.js";
-import {registerSchema}  from "../../validation/zod.validation.js";
+import { registerSchema } from "../../validation/zod.validation.js";
 
 export const register = async (req, res, next) => {
   try {
@@ -10,7 +10,6 @@ export const register = async (req, res, next) => {
 
     // 2. Call Service
     const newUser = await authService.registerService(req.body);
-
     // 3. Response
     res.status(201).json({
       message: "Admin registered successfully",
@@ -22,7 +21,7 @@ export const register = async (req, res, next) => {
     if (error.message === "Username already exists") {
       return res.status(409).json({ message: "อีเมลนี้ถูกใช้งานแล้ว" });
     }
-    next(error); 
+    next(error);
   }
 };
 

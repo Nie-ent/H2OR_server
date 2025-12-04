@@ -6,13 +6,13 @@ import { authMiddleware } from "../middlewares/auth.middleware.js";
 const authRoutes = Router();
 
 // POST /auth/register - register admin
-authRoutes.post("/register", register);
+authRoutes.post("/auth/register", register);
 
 // POST /auth/login - login admin
-authRoutes.post("/login", login);
+authRoutes.post("/auth/login", login);
 
 // GET /auth/me - get current logged-in user
-authRoutes.get("/me", authMiddleware, getMe);
+authRoutes.get("/auth/me", authMiddleware, getMe);
 
 
 export default authRoutes;
