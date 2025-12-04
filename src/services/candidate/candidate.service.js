@@ -1,5 +1,6 @@
 import prisma from "../../config/prisma-client.config.js"
 import createHttpError from "http-errors"
+import ai from "../ai/ai.service.js"
 
 export const findCandidate = async (email) => {
     try {
@@ -12,21 +13,22 @@ export const findCandidate = async (email) => {
     }
 }
 
-export const applyResumeService = async (firstName, lastName, email, phone, gender, age, stack, expectedSalary) => {
+export const applyResumeService = async (firstName, lastName, email, phone, gender, age, stack, expectedSalary, idCard) => {
     try {
         const newCandidate = await prisma.candidate.create({
             data: {
-                firstName: firstName,
-                lastName: lastName,
+                firstName,
+                lastName,
                 email,
                 phone,
                 gender,
                 age,
                 stack,
-                expectedSalary: expectedSalary,
+                expected_salary: expectedSalary,
+                id_card: idCard
             },
         });
-        console.log(newCandidate)
+        // console.log("nexCandidate: ", newCandidate)
         return newCandidate;
     } catch (error) {
         console.error("Error creating candidate:", error);
@@ -74,6 +76,20 @@ export const updateCandidateService = async (id, data) => {
         }
     });
 };
+
+export const giveScoreCandidateResume = async (id, pdfBase64) => {
+    // AI return { score: 99 }
+    const { score } = await ai(pdfBase64);
+
+    // Update candidate score
+    const updatedCandidate = await prisma.candidate.update({
+        where: { candidate_id: id },
+        data: { score: score }
+    });
+
+    return updatedCandidate;
+};
+
 
 export const deleteCandidateService = async (id) => {
     return await prisma.candidate.delete({

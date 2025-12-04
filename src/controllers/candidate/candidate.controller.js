@@ -14,6 +14,7 @@ import {
     getCandidateDocumentsService,
     getCandidateInfoByIdService,
     getCandidateStatusService,
+    giveScoreCandidateResume,
     rejectCandidateStatusService,
     requestUpdateCandidateStatusService,
     updateCandidateAddressService,
@@ -23,9 +24,9 @@ import {
     from "../../services/candidate/candidate.service.js";
 
 export const resumeApplication = async (req, res) => {
-    console.log(req.body)
+    // console.log("req.body: ", req.body)
     try {
-        const { firstName, lastName, email, phone, gender, age, stack, expected_salary } = req.body;
+        const { firstName, lastName, email, phone, gender, age, stack, expectedSalary, idCard } = req.body;
 
         const existingCandidate = await findCandidate(email);
         if (existingCandidate) {
@@ -40,9 +41,10 @@ export const resumeApplication = async (req, res) => {
             gender,
             age,
             stack,
-            expected_salary
+            expectedSalary,
+            idCard
         );
-        console.log("newCandidate",newCandidate)
+        // console.log("newCandidate", newCandidate)
 
         return res.status(201).json({
             message: "Candidate created successfully",
@@ -156,8 +158,9 @@ export const createCandidateDocument = async (req, res) => {
     let uploadResult
 
     try {
+        const candidate_id = req.params.candidateId
         const haveFile = req.file
-        console.log('haveFile', haveFile)
+        // console.log('haveFile', haveFile)
         if (haveFile) {
             uploadResult = await cloudinary.uploader.upload(haveFile.path, {
                 folder: "documents",
@@ -172,6 +175,9 @@ export const createCandidateDocument = async (req, res) => {
 
         const documentData = { candidate_id, file_url, file_type, doc_type }
         const newDocument = await createCandidateDocumentService(documentData);
+        const getResumeScore = await giveScoreCandidateResume(candidate_id, file_url)
+
+        console.log('getResumeScore', getResumeScore)
 
         return res.status(201).json({
             message: "Document created successfully",
