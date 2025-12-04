@@ -49,9 +49,9 @@ enum AddressType {
 // ----------------------------------------------------
 model AdminUser {
   admin_user_id   String   @id @default(uuid())
-  username       String    @unique
-  firstName      String
-  lastName       String
+  username        String   @unique
+  firstName       String
+  lastName        String
   email           String   @unique
   role            Role     @default(admin)
   password_hash   String
@@ -66,8 +66,8 @@ model AdminUser {
 // ----------------------------------------------------
 model Candidate {
   candidate_id      String  @id @default(uuid())
-  firstName        String
-  lastName         String
+  firstName         String
+  lastName          String
   email             String  @unique
   phone             String?
   gender            String?
@@ -76,6 +76,7 @@ model Candidate {
   expected_salary   Int?
   stack             String?
   id_card           String?
+  score             Int?
 
   tests              Test[]
   candidate_statuses CandidateStatus[]
