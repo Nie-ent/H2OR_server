@@ -7,7 +7,7 @@ const ai = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 async function main() {
     const pdfResp = await fetch(
-        "https://discovery.ucl.ac.uk/id/eprint/10089234/1/343019_3_art_0_py4t4l_convrt.pdf"
+        "https://res.cloudinary.com/dvrv4wf6s/image/upload/v1764837864/documents/ssxzlgijarpflujpeveu.pdf"
     ).then((response) => response.arrayBuffer());
 
     const pdfBase64 = Buffer.from(pdfResp).toString("base64");
@@ -17,7 +17,38 @@ async function main() {
     });
 
     const result = await model.generateContent([
-        { text: "Review resume and give a score 1-100. Return ONLY this JSON format: { score: number }" },
+        {
+            text: `
+You are an expert HR Recruiter with 10+ years of experience in evaluating resumes.
+
+IMPORTANT:
+- The uploaded PDF is ALWAYS a resume.
+- Do NOT interpret it as a research paper, academic document, scientific article, journal, or publication.
+- If the document layout looks unusual, you must still evaluate it *as a resume only*.
+
+Your task:
+1. Read and analyze the resume.
+2. Evaluate it based on these criteria:
+   - Clarity & structure
+   - Professional experience relevance
+   - Skills & competencies
+   - Achievements & measurable results
+   - Formatting & readability
+   - Overall candidate strength
+
+Return ONLY this JSON:
+
+{
+  "score": number,
+  "comment": string
+}
+
+RULES:
+- JSON only
+- No markdown
+- No backticks
+- No extra explanation
+` },
         {
             inlineData: {
                 mimeType: "application/pdf",
@@ -28,13 +59,13 @@ async function main() {
 
     const output = result.response.text();
 
-    // ล้าง ```json ``` หรือ ```
-    const cleaned = output.replace(/```json|```/g, "").trim();
+    const cleaned = output
+        .replace(/```json/g, "")
+        .replace(/```/g, "")
+        .trim();
 
-    // แปลงเป็น object
     const parsed = JSON.parse(cleaned);
 
-    // 🟢 คืนค่า object จริง ไม่ใช่ string เดิม
     return parsed;
 }
 

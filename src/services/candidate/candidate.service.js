@@ -87,7 +87,9 @@ export const giveScoreCandidateResume = async (id, pdfBase64) => {
         data: { score: score }
     });
 
-    return updatedCandidate;
+    const data = { ...updatedCandidate, ...score }
+
+    return data;
 };
 
 
