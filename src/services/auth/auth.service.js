@@ -6,13 +6,15 @@ import createHttpError from "http-errors";
 import { signToken, verifyToken } from "../../libs/jwt.lib.js";
 
 export const registerService = async (data) => {
+
+  console.log('data', data)
   // 1. เช็คว่ามีอีเมลนี้ในระบบหรือยัง
   const existingUser = await prisma.adminUser.findUnique({
     where: { username: data.username },
   });
 
   if (existingUser) {
-    throw new createHttpError("username already exists"); 
+    throw new createHttpError("username already exists");
   }
 
   // 2. เข้ารหัสรหัสผ่าน (Hashing)
@@ -29,7 +31,7 @@ export const registerService = async (data) => {
       role: data.role, // default role
     },
     // เลือก return เฉพาะฟิลด์ที่ปลอดภัย (ไม่ส่ง password กลับ)
-    select: { 
+    select: {
       admin_user_id: true,
       firstName: true,
       lastName: true,
@@ -53,19 +55,18 @@ export const loginService = async (data) => {
     throw new createHttpError("Invalid credentials");
   }
 
-// 2. ตรวจสอบรหัสผ่าน
+  // 2. ตรวจสอบรหัสผ่าน
   const isPasswordValid = await compareHash(user.password_hash, data.password);
-
   if (!isPasswordValid) {
     throw new createHttpError("Invalid credentials");
   }
-  
+
   // 3. สร้าง JWT Token (บัตรผ่าน)
   const token = signToken(
-    { 
-      id: user.admin_user_id, 
+    {
+      id: user.admin_user_id,
       role: user.role,
-      username: user.username 
+      username: user.username
     },
   );
   // ส่งกลับทั้ง Token และข้อมูล User (ไม่รวม password)
@@ -92,9 +93,9 @@ export const getMeService = async (userId) => {
       created_at: true,
     },
   });
-  
+
   if (!user) throw createHttpError("User not found");
-  
+
   return user;
-  
+
 };
