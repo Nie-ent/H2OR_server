@@ -28,7 +28,7 @@ import {
 
 
 export const getAllCandidates = async (req, res) => {
-    console.log("[getAllCandidates] start")
+    // console.log("[getAllCandidates] start")
     try {
         const candidateData = await prisma.candidate.findMany({
            
