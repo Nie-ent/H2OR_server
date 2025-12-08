@@ -31,14 +31,14 @@ const generateCandidateData = (index) => {
     const firstName = firstNames[getRandomInt(0, firstNames.length - 1)];
     const lastName = lastNames[getRandomInt(0, lastNames.length - 1)];
     // สร้างอีเมลที่ดูสมจริง
-    const email = `${firstName.toLowerCase()}.${lastName.toLowerCase()}${index + 1}@corpmail.com`;    
-    
+    const email = `${firstName.toLowerCase()}.${lastName.toLowerCase()}${index + 1}@corpmail.com`;
+
     const selectedGender = genders[getRandomInt(0, genders.length - 1)];
     const age = getRandomInt(22, 45);
     const expSalary = getRandomInt(30000, 80000);
     const expectedSalary = expSalary + getRandomInt(5000, 20000);
     const selectedStack = Array.from({ length: getRandomInt(1, 3) }, () => stacks[getRandomInt(0, stacks.length - 1)]).join(', ');
-    
+
     let idCard = '1' + String(100000000000 + index + 1).slice(-12);
 
     return {
@@ -71,7 +71,7 @@ async function generateBulkCandidates(count = 500) {
         });
         candidatePromises.push(candidatePromise);
     }
-    
+
     // ใช้ Promise.all เพื่อสร้าง Candidates พร้อมกัน
     const candidates = await Promise.all(candidatePromises);
     console.log(`✅ Successfully created/upserted ${candidates.length} candidates.`);
@@ -80,7 +80,7 @@ async function generateBulkCandidates(count = 500) {
     const addressPromises = candidates.map((candidate) => {
         const selectedCity = cities[getRandomInt(0, cities.length - 1)];
         const postal = postalCodes[selectedCity];
-        
+
         return prisma.address.upsert({
             where: {
                 candidate_id_address_type: {
@@ -103,7 +103,7 @@ async function generateBulkCandidates(count = 500) {
 
     await Promise.all(addressPromises);
     console.log(`✅ Successfully created/upserted ${addressPromises.length} bulk addresses.`);
-    
+
     return candidates;
 }
 
@@ -172,12 +172,12 @@ async function main() {
     // -----------------------------
     // 2️⃣ CANDIDATES (BULK DATA ONLY)
     // -----------------------------
-    
+
     // 🔥 CALL BULK GENERATOR (500 CANDIDATES) 🔥
-    const allCandidates = await generateBulkCandidates(500); 
+    const allCandidates = await generateBulkCandidates(500);
 
     // 🔴 ผู้สมัครตัวอย่าง (Alice และ Bob) ถูกลบออกทั้งหมด
-    
+
     // 🟢 กำหนดตัวอย่างผู้สมัครสำหรับส่วนที่ 7 (ใช้คนแรกจากกลุ่ม Bulk)
     const candidateExample = allCandidates[0];
 
@@ -407,7 +407,7 @@ async function main() {
                 { text: 'The script is ignored by the browser.', correct: false },
             ]
         ),
-        
+
         // -----------------------------------------------------------------
         // ⚛️ JavaScript & ES6 (30 Questions)
         // -----------------------------------------------------------------
@@ -1015,7 +1015,7 @@ async function main() {
                 { text: 'Through the `context` object.', correct: false },
             ]
         ),
-        
+
         // -----------------------------------------------------------------
         // ⚙️ Node.js & Backend (30 Questions)
         // -----------------------------------------------------------------
@@ -1319,7 +1319,7 @@ async function main() {
                 { text: 'SERVER_URL', correct: false },
             ]
         ),
-        
+
         // -----------------------------------------------------------------
         // 💾 Database & General Concepts (20 Questions)
         // -----------------------------------------------------------------
@@ -1525,7 +1525,7 @@ async function main() {
         ),
     ];
 
-   
+
 
     // 4️⃣ QUESTIONS & CHOICES: 
     const questions = [];
@@ -1533,7 +1533,7 @@ async function main() {
         const question = await prisma.question.create({
             data: {
                 question_text: q.text,
-                difficulty: q.difficulty, 
+                difficulty: q.difficulty,
                 mcq: true,
                 choices: { create: q.choices.map(c => ({ choice_text: c.text, is_correct: c.correct })) },
             },
@@ -1566,25 +1566,25 @@ async function main() {
         const test = await prisma.test.upsert({
             where: { test_id: testUniqueId },
             update: {},
-            create: { 
-                test_id: testUniqueId, 
+            create: {
+                test_id: testUniqueId,
                 candidate_id: candidateId,
             },
         });
 
         // 5️⃣ TESTQUESTIONS: เชื่อมโยงคำถามทั้งหมด (100 ข้อ)
-        const testQuestionPromises = questions.map((q) => 
-             prisma.testQuestion.upsert({
+        const testQuestionPromises = questions.map((q) =>
+            prisma.testQuestion.upsert({
                 where: { test_id_question_id: { test_id: test.test_id, question_id: q.question_id } },
                 update: {},
                 create: { test_id: test.test_id, question_id: q.question_id },
             })
         );
         await Promise.all(testQuestionPromises);
-        
+
         // 6️⃣ TEST ANSWERS: บันทึกคำตอบจำลอง (2 ข้อแรก)
         const testAnswerPromises = answerTemplate.map((ta) =>
-             prisma.testAnswer.upsert({
+            prisma.testAnswer.upsert({
                 where: { test_id_question_id: { test_id: test.test_id, question_id: ta.question.question_id } },
                 update: {},
                 create: {
@@ -1596,7 +1596,7 @@ async function main() {
             })
         );
         await Promise.all(testAnswerPromises);
-        
+
         // Console log เพื่อติดตามความคืบหน้า
         // console.log(`✅ Processed Test & Answers for: ${candidate.first_name} ${candidate.last_name} (Total: ${allCandidates.indexOf(candidate) + 1}/${allCandidates.length})`);
     }
@@ -1620,11 +1620,11 @@ async function main() {
         const statusRecord = await prisma.candidateStatus.upsert({
             where: { candidate_status_id: statusId },
             update: {},
-            create: { 
-                candidate_status_id: statusId, 
-                candidate_id: candidateId, 
-                status: CandidateStatusEnum.pass, 
-                updated_by: admin1.admin_user_id 
+            create: {
+                candidate_status_id: statusId,
+                candidate_id: candidateId,
+                status: CandidateStatusEnum.pass,
+                updated_by: admin1.admin_user_id
             },
         });
 
@@ -1632,11 +1632,11 @@ async function main() {
         await prisma.document.upsert({
             where: { candidate_id_doc_type: { candidate_id: candidateId, doc_type: DocTypeEnum.pdf } },
             update: {},
-            create: { 
-                candidate_id: candidateId, 
+            create: {
+                candidate_id: candidateId,
                 file_url: `https://docs.example.com/${candidate.email}/cv.pdf`, // ใช้อีเมลสร้าง URL ที่ไม่ซ้ำ
-                file_type: 'application/pdf', 
-                doc_type: DocTypeEnum.pdf 
+                file_type: 'application/pdf',
+                doc_type: DocTypeEnum.pdf
             },
         });
 
@@ -1644,12 +1644,12 @@ async function main() {
         await prisma.statusUpdateRequests.upsert({
             where: { status_update_request_id: requestId },
             update: {},
-            create: { 
-                status_update_request_id: requestId, 
+            create: {
+                status_update_request_id: requestId,
                 candidate_status_id: statusRecord.candidate_status_id, // อ้างอิงสถานะที่เพิ่งสร้าง
-                requested_status: StatusEnum.accepted, 
-                approve_by: admin1.admin_user_id, 
-                status: StatusEnum.accepted 
+                requested_status: StatusEnum.accepted,
+                approve_by: admin1.admin_user_id,
+                status: StatusEnum.accepted
             },
         });
     }

@@ -31,7 +31,7 @@ export const getAllCandidates = async (req, res) => {
     // console.log("[getAllCandidates] start")
     try {
         const candidateData = await prisma.candidate.findMany({
-           
+
         })
         return res.status(200).json({
             message: "Candidate list retrieved successfully",
@@ -67,7 +67,7 @@ export const resumeApplication = async (req, res) => {
             expectedSalary,
             idCard
         );
-        // console.log("newCandidate", newCandidate)
+        console.log("newCandidate", newCandidate)
 
         return res.status(201).json({
             message: "Candidate created successfully",
