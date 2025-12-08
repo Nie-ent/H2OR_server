@@ -22,6 +22,7 @@ import {
     requestUpdateCandidateStatus,
     rejectCandidateStatus,
     approveCandidateStatus,
+    getAllCandidates
 } from "../controllers/candidate/candidate.controller.js";
 
 import upload from "../middlewares/upload.middleware.js";
@@ -30,6 +31,7 @@ const candidateRoutes = Router();
 
 // Candidate
 candidateRoutes.post("/candidates", resumeApplication);
+candidateRoutes.get("/candidates", getAllCandidates);
 candidateRoutes.get("/candidates/:candidateId", getCandidateInfoById);
 candidateRoutes.put("/candidates/:candidateId", updateCandidateInfo);
 candidateRoutes.delete("/candidates/:candidateId", deleteCandidate);

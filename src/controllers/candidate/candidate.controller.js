@@ -1,6 +1,9 @@
 import path from "path";
 import cloudinary from "../../config/cloudinary.config.js";
 import fs from 'fs/promises'
+
+import prisma from "../../config/prisma-client.config.js";
+
 import {
     addCandidateAddressService,
     applyResumeService,
@@ -22,6 +25,26 @@ import {
     updateCandidateStatusService,
 }
     from "../../services/candidate/candidate.service.js";
+
+
+export const getAllCandidates = async (req, res) => {
+    console.log("[getAllCandidates] start")
+    try {
+        const candidateData = await prisma.candidate.findMany({
+           
+        })
+        return res.status(200).json({
+            message: "Candidate list retrieved successfully",
+            data: candidateData
+        })
+
+    } catch (error) {
+        console.log("Error fetching candidate list:", error);
+        return res.status(500).json({
+            message: "Internal server error"
+        })
+    }
+}
 
 export const resumeApplication = async (req, res) => {
     // console.log("req.body: ", req.body)
@@ -343,3 +366,5 @@ export const rejectCandidateStatus = async (req, res) => {
         res.status(400).json({ message: error.message });
     }
 };
+
+
