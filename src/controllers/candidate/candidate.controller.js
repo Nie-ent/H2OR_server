@@ -49,7 +49,7 @@ export const getAllCandidates = async (req, res) => {
 export const resumeApplication = async (req, res) => {
     // console.log("req.body: ", req.body)
     try {
-        const { firstName, lastName, email, phone, gender, age, stack, expectedSalary, idCard } = req.body;
+        const { firstName, lastName, email, phone, gender, age, stack, expectedSalary, idCard, score, experience, experience_salary } = req.body;
 
         const existingCandidate = await findCandidate(email);
         if (existingCandidate) {
@@ -65,7 +65,10 @@ export const resumeApplication = async (req, res) => {
             age,
             stack,
             expectedSalary,
-            idCard
+            idCard,
+            score,
+            experience,
+            experience_salary,
         );
         console.log("newCandidate", newCandidate)
 

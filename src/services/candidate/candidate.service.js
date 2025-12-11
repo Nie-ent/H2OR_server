@@ -13,7 +13,7 @@ export const findCandidate = async (email) => {
     }
 }
 
-export const applyResumeService = async (firstName, lastName, email, phone, gender, age, stack, expectedSalary, idCard) => {
+export const applyResumeService = async (firstName, lastName, email, phone, gender, age, stack, expectedSalary, idCard, score, experience, experience_salary) => {
     try {
         const newCandidate = await prisma.candidate.create({
             data: {
@@ -25,7 +25,10 @@ export const applyResumeService = async (firstName, lastName, email, phone, gend
                 age,
                 stack,
                 expected_salary: expectedSalary,
-                id_card: idCard
+                id_card: idCard,
+                score,
+                experience,
+                experience_salary,
             },
         });
         // console.log("nexCandidate: ", newCandidate)
