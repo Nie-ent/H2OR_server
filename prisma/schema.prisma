@@ -72,12 +72,12 @@ model Candidate {
   phone             String?
   gender            String?
   age               Int?
+  experience        Int?
   experience_salary Int?
   expected_salary   Int?
   stack             String?
   id_card           String?
   score             Int?
-
   tests              Test[]
   candidate_statuses CandidateStatus[]
   documents          Document[]
